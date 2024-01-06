@@ -1,0 +1,11 @@
+{
+  "name": "i-cli",
+  "version": "1.0.0",
+  "description": "A CLI tool for Ivan.",
+  "bin": {
+    "i": "i.coffee"
+  },
+  "dependencies": {
+    "please-reload": "latest"
+  }
+}
