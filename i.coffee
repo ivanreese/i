@@ -62,7 +62,7 @@ read = (filePath)-> if exists filePath then fs.readFileSync(filePath).toString()
 help =
   help:   "Babe you're reading it"
   update: "Update brew, npm, and i"
-  serve:  "Runs PleaseReload in the current dir"
+  serve:  "Run PleaseReload in the current dir"
   fps:    "Metal performance HUD — pass a truthy arg to show, falsey to hide"
 
 version = ()-> require("./package.json").version
@@ -73,12 +73,13 @@ commands = {}
 
 commands.help = ()->
   log ""
-  log cyan "  i cli • Version #{version()}"
+  log cyan "i the cli • Version #{version()}"
+  log ""
   maxNameLength = 0
   for name, description of help
     maxNameLength = Math.max name.length, maxNameLength
   for name, description of help
-    log yellow "    " + name.padEnd(maxNameLength + 2) + blue description
+    log yellow " " + name.padEnd(maxNameLength + 2) + blue description
   log ""
 
 commands.update = ()->
@@ -92,7 +93,7 @@ commands.update = ()->
   exec "npm i -g coffeescript --silent"
 
   log yellow "\nUpdating " + cyan "i"
-  exec "npm i -g i-cli --silent"
+  exec "npm i -g i-the-cli --silent"
 
   log green "i am now version:"
   exec "i version"

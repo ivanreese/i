@@ -1,5 +1,5 @@
 {
-  "name": "i-cli",
+  "name": "i-the-cli",
   "version": "1.0.0",
   "description": "A CLI tool for Ivan.",
   "bin": {
