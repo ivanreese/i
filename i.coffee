@@ -62,7 +62,7 @@ read = (filePath)-> if exists filePath then fs.readFileSync(filePath).toString()
 help =
   help:   "Babe you're reading it"
   update: "Update brew, npm, and i"
-  serve:  "Run PleaseReload in the current dir"
+  serve:  "Run PleaseReload at the given path (pwd by default)"
   fps:    "Metal performance HUD — pass a truthy arg to show, falsey to hide"
 
 version = ()-> require("./package.json").version
@@ -102,8 +102,8 @@ commands.update = ()->
 commands.version = ()->
   log version()
 
-commands.serve = ()->
-  PleaseReload.serve "."
+commands.serve = (path = ".")->
+  PleaseReload.serve path
 
 commands.fps = ()->
   [flag] = args()
@@ -114,9 +114,10 @@ commands.fps = ()->
 # Main
 
 command = process.argv[2] or "help"
+args = process.argv.slice(3)
 
 if commands[command]
-  do commands[command]
+  do commands[command] ...args
 else
   log red "\n  Error: " + yellow command + red " is not a valid command."
   commands.help()
