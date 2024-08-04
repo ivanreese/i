@@ -1,6 +1,6 @@
 {
   "name": "i-the-cli",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "A CLI tool for Ivan.",
   "bin": {
     "i": "i.coffee"
