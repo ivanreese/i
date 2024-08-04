@@ -102,8 +102,9 @@ commands.update = ()->
 commands.version = ()->
   log version()
 
-commands.serve = (path = ".")->
-  PleaseReload.serve path
+commands.serve = ()->
+  [path] = args()
+  PleaseReload.serve path or "."
 
 commands.fps = ()->
   [flag] = args()
@@ -114,10 +115,9 @@ commands.fps = ()->
 # Main
 
 command = process.argv[2] or "help"
-args = process.argv.slice(3)
 
 if commands[command]
-  do commands[command] ...args
+  do commands[command]
 else
   log red "\n  Error: " + yellow command + red " is not a valid command."
   commands.help()
