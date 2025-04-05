@@ -1,5 +1,6 @@
 #!/usr/bin/env coffee
 
+Chokidar = require "chokidar"
 child_process = require "node:child_process"
 fs = require "node:fs"
 PleaseReload = require "please-reload"
@@ -57,13 +58,29 @@ rm = (filePath)-> if exists filePath then fs.rmSync filePath, recursive: true
 isDir = (filePath)-> fs.statSync(filePath).isDirectory()
 read = (filePath)-> if exists filePath then fs.readFileSync(filePath).toString()
 
+debounce = (time, fn)->
+  timeout = null
+  ()->
+    clearTimeout timeout
+    timeout = setTimeout fn, time
+
+dotfiles = /(^|[\/\\])\../
+
+# File watcher
+runWatcher = (path, cmd, debounceTime = 100)->
+  runActionsSoon = debounce debounceTime, ()-> exec cmd
+  Chokidar.watch path, ignored: dotfiles
+    .on "error", -> log red "Watching #{path} failed"
+    .on "all", () -> runActionsSoon()
+
 # Domain Helpers / Config
 
 help =
   help:   "Babe you're reading it"
   update: "Update brew, npm, and i"
   serve:  "Run PleaseReload at the given path (pwd by default)"
-  fps:    "Metal performance HUD — pass a truthy arg to show, falsey to hide"
+  watch:  "Give a path, and all following text as a cmd"
+  fps:    "Metal performance HUD — pass a truthy arg to show, falsey to hide"
 
 version = ()-> require("./package.json").version
 
@@ -105,6 +122,10 @@ commands.version = ()->
 commands.serve = ()->
   [path] = args()
   PleaseReload.serve path or "."
+
+commands.watch = ()->
+  [path, ...rest] = args()
+  runWatcher path, rest.join(" ")
 
 commands.fps = ()->
   [flag] = args()

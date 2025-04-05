@@ -1,11 +1,12 @@
 {
   "name": "i-the-cli",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "A CLI tool for Ivan.",
   "bin": {
     "i": "i.coffee"
   },
   "dependencies": {
+    "chokidar": "latest",
     "please-reload": "latest"
   }
 }
