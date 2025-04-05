@@ -76,11 +76,11 @@ runWatcher = (path, cmd, debounceTime = 100)->
 # Domain Helpers / Config
 
 help =
-  help:   "Babe you're reading it"
-  update: "Update brew, npm, and i"
-  serve:  "Run PleaseReload at the given path (pwd by default)"
-  watch:  "Give a path, and all following text as a cmd"
-  fps:    "Metal performance HUD — pass a truthy arg to show, falsey to hide"
+  help:  "Babe you're reading it"
+  up:    "Update brew, npm, and i"
+  serve: "Run PleaseReload at the given path (pwd by default)"
+  watch: "Give a path, and all following text as a cmd"
+  fps:   "Metal performance HUD — pass a truthy arg to show, falsey to hide"
 
 version = ()-> require("./package.json").version
 
@@ -99,7 +99,7 @@ commands.help = ()->
     log yellow " " + name.padEnd(maxNameLength + 2) + blue description
   log ""
 
-commands.update = ()->
+commands.up = ()->
   log yellow "\nUpdating " + cyan "brew"
   exec "brew update"
   exec "brew upgrade"
