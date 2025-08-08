@@ -1,6 +1,5 @@
 #!/usr/bin/env coffee
 
-Chokidar = require "chokidar"
 child_process = require "node:child_process"
 fs = require "node:fs"
 PleaseReload = require "please-reload"
@@ -10,34 +9,8 @@ PleaseReload = require "please-reload"
 
 # Who needs chalk when you can just roll your own ANSI escape sequences
 do ()->
-  fmts =
-    bold: 1, dim: 2, italic: 3, underline: 4, overline: 53, inverse: 7, strike: 9,
-    black: 30, red: 31, green: 32, yellow: 33, blue: 34, magenta: 35, cyan: 36, white: 37,
-    blackBright: 90, grey: 90, redBright: 91, greenBright: 92, yellowBright: 93, blueBright: 94, magentaBright: 95, cyanBright: 96, whiteBright: 97,
-    bgBlack: 40, bgRed: 41, bgGreen: 42, bgYellow: 43, bgBlue: 44, bgMagenta: 45, bgCyan: 46, bgWhite: 47,
-    bgBlackBright: 100, bgGrey: 100, bgRedBright: 101, bgGreenBright: 102, bgYellowBright: 103, bgBlueBright: 104, bgMagentaBright: 105, bgCyanBright: 106, bgWhiteBright: 107
-  for fmt, v of fmts
+  for fmt, v of red: 31, green: 32, yellow: 33, blue: 34, magenta: 35, cyan: 36
     do (fmt, v)-> global[fmt] = (t)-> "\x1b[#{v}m" + t + "\x1b[0m"
-
-# Pad the start and end of a string to a target length
-padAround = (str, len = 80, char = " ")->
-  str.padStart(Math.ceil(len/2 + str.length/2), char).padEnd(len, char)
-
-# Wrap a string to the a desired character length
-# https://stackoverflow.com/a/51506718/313576
-linewrap = (s, len = 80, sep = "\n")-> s.replace new RegExp("(?![^\\n]{1,#{len}}$)([^\\n]{1,#{len}})\\s", "g"), "$1#{sep}"
-
-# Prepend a string with a newline. Useful when logging.
-br = (m)-> "\n" + m
-
-# Indent a string using a given line prefix
-indent = (str, prefix = "  ")-> prefix + str.replaceAll "\n", "\n" + prefix
-
-# Surround a string with another string
-surround = (inner, outer = " ")-> outer + inner + outer
-
-# Generate a nice divider, optionally with text in the middle
-divider = (s = "")-> br padAround(s, 80, "─") + "\n"
 
 # console.log should have expression semantics
 log = (...things)-> console.log ...things; things[0]
@@ -50,14 +23,6 @@ args = (options)->
 # Saner default for execSync
 exec = (cmd, opts = {stdio: "inherit"})-> child_process.execSync cmd, opts
 
-# Little sugary filesystem helpers
-exists = (filePath)-> fs.existsSync filePath
-readdir = (filePath)-> fs.readdirSync(filePath).filter (i)-> i isnt ".DS_Store"
-mkdir = (filePath)-> fs.mkdirSync filePath, recursive: true
-rm = (filePath)-> if exists filePath then fs.rmSync filePath, recursive: true
-isDir = (filePath)-> fs.statSync(filePath).isDirectory()
-read = (filePath)-> if exists filePath then fs.readFileSync(filePath).toString()
-
 debounce = (time, fn)->
   timeout = null
   ()->
@@ -69,9 +34,8 @@ dotfiles = /(^|[\/\\])\../
 # File watcher
 runWatcher = (path, cmd, debounceTime = 100)->
   runActionsSoon = debounce debounceTime, ()-> exec cmd
-  Chokidar.watch path, ignored: dotfiles
-    .on "error", -> log red "Watching #{path} failed"
-    .on "all", () -> runActionsSoon()
+  try fs.watch path, recursive: true, (eventType, filename)-> if filename and not dotfiles.test(filename) then runActionsSoon()
+  catch error then log red "Watching #{path} failed"
 
 # Domain Helpers / Config
 
@@ -129,7 +93,7 @@ commands.watch = ()->
 
 commands.fps = ()->
   [flag] = args()
-  flag = if flag then 1 else 0
+  flag = if JSON.parse flag then 1 else 0
   exec("/bin/launchctl setenv MTL\_HUD\_ENABLED #{flag}")
   console.log "Metal Performance HUD " + if flag then "on" else "off"
 
